@@ -1,34 +1,34 @@
-resource "aws_s3_bucket" "one" {
-  bucket = "mustafa77.flm77.moonobucket"
+resource "aws_s3_bucket" "myS3" {
+  bucket = "noor.2026"
 }
 
-resource "aws_s3_bucket_ownership_controls" "two" {
-  bucket = aws_s3_bucket.one.id
+resource "aws_s3_bucket_versioning" "myVR" {
+  bucket = aws_s3_bucket.myS3.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+resource "aws_s3_bucket_ownership_controls" "myOC" {
+  bucket = aws_s3_bucket.myS3.id
   rule {
     object_ownership = "BucketOwnerPreferred"
   }
 }
 
-resource "aws_s3_bucket_acl" "three" {
-  depends_on = [aws_s3_bucket_ownership_controls.two]
-
-  bucket = aws_s3_bucket.one.id
-  acl    = "private"
+resource "aws_s3_bucket_public_access_block" "myPAB" {
+  bucket                  = aws_s3_bucket.myS3.id
+  block_public_acls       = false
+  ignore_public_acls      = false
+  block_public_policy     = false
+  restrict_public_buckets = false
 }
 
-resource "aws_s3_bucket_versioning" "three" {
-bucket = aws_s3_bucket.one.id
-versioning_configuration {
-status = "Enabled"
-}
+resource "aws_s3_bucket_acl" "myACL" {
+  depends_on = [aws_s3_bucket_ownership_controls.myOC, aws_s3_bucket_public_access_block.myPAB]
+  bucket     = aws_s3_bucket.myS3.id
+  acl        = "public-read-write"
 }
 
-terraform {
-backend "s3" {
-region = "us-east-1"
-bucket = "mustafa77.flm77.moonobucket"
-key = "prod/terraform.tfstate"
-}
-}
+
 
 
