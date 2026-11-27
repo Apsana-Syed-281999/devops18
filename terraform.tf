@@ -132,15 +132,7 @@ resource "aws_launch_template" "myLT" {
       Name = "ASG-Server"
     }
   }
-  user_data = base64encode(<<-EOF
-#!/bin/bash
-sudo yum update -y
-sudo yum install httpd -y
-sudo systemctl start httpd
-sudo systemctl enable httpd
-echo '<h1>This is ASG-Server</h1>' | sudo tee /var/www/html/index.html
-EOF
-  )
+
 }
 
 
