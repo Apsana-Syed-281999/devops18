@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+    stages{
+        stage("Code"){
+            steps{
+                git branch: 'main', url: 'https://github.com/Apsana-Syed-281999/devops18.git'
+            }
+        }
+        stage("Terraform init"){
+            steps{
+                sh 'echo -e "yes\n" | terraform init'
+            }
+        }
+        stage("Validate"){
+            steps{
+                sh 'terraform validate'
+            }
+        }
+        stage("Plan"){
+            steps{
+                sh 'terraform plan'
+            }
+        }
+        stage("Format"){
+            steps{
+                sh 'terraform fmt'
+            }
+        }
+        stage("apply"){
+            steps{
+                sh 'terraform apply --auto-approve'
+            }
+        }
+        stage("ansible commands"){
+            steps{
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: 'ansible-ssh-key',
+                    keyFileVariable: 'SSH_KEY',
+                    usernameVariable: 'SSH_USER'
+                )]) {
+                    sh '''
+                      ansible-playbook \
+                        -i /opt/ansible/inventory/aws_ec2.yml \
+                        ansible/deployment.yml \
+                        -u "$SSH_USER" \
+                        --private-key "$SSH_KEY"
+                    '''
+                }
+       
+                
+            }
+        }
+    }
+}
