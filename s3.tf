@@ -30,5 +30,12 @@ resource "aws_s3_bucket_acl" "myACL" {
 }
 
 
+terraform {
+backend "s3" {
+region = "us-east-1"
+bucket = "noor.2026"
+key = "prod/terraform.tfstate"
+}
+}
 
 
